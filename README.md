@@ -1,72 +1,81 @@
 # MarcaCheck 360 · MVP
 
-MVP de una plataforma de prediagnóstico marcario para Colombia. Permite investigar cualquier nombre o signo y ejecutar análisis en una, varias o las 45 clases de la Clasificación Internacional de Niza.
+Plataforma de prediagnóstico marcario para Colombia. Permite investigar cualquier nombre o signo en una, varias o las 45 clases de la Clasificación Internacional de Niza.
 
-## Alcance actual
+## Estado actual
 
-- Entrada de cualquier nombre o signo.
-- Descripción libre del negocio/producto/servicio.
-- Tipo de signo: marca denominativa, mixta, lema, nombre comercial o enseña.
-- Selección manual de clases Niza.
-- Barrido completo de las 45 clases.
-- Recomendación automática de clases desde Supabase con `recommend_nice_classes()`.
-- Autenticación con Supabase Auth.
-- Persistencia de búsquedas, clases, coincidencias y reportes mediante PostgreSQL.
-- Row Level Security para separar los datos por usuario.
-- Motor de análisis ejecutado mediante la Edge Function `analyze-mark`.
-- Score de viabilidad y semáforo de riesgo.
-- Mapa de riesgo por clase.
-- Coincidencias demostrativas priorizadas.
-- Historial persistente en Supabase.
-- Recuperación de análisis previos desde el historial.
+- Búsqueda operativa en modo invitado y autenticado.
+- Modo invitado con motor local de respaldo e historial en `localStorage`.
+- Supabase Auth para usuarios que desean persistencia en la nube.
+- Catálogo base de las 45 clases Niza, versionado como `NCL 13-2026`.
+- Recomendación automática mediante `recommend_nice_classes(description text)`.
+- Selección manual, recomendada o barrido de las 45 clases.
+- Persistencia de búsquedas, clases, coincidencias y estado de fuentes.
+- Row Level Security por usuario.
+- Edge Function `analyze-mark` v2.
+- El riesgo jurídico global permanece `insufficient` mientras SIPI y RUES no estén completos.
+- Coincidencias demo claramente identificadas y separadas de datos oficiales.
+- Historial persistente para usuarios autenticados.
 - Vista imprimible/PDF desde el navegador.
 - Diseño responsive.
 
 ## Backend
 
-Proyecto Supabase: `MarcaCheck 360`
+Proyecto Supabase: `MarcaCheck 360`.
 
 Tablas principales:
 
 - `nice_classes`
+- `nice_versions`
+- `source_integrations`
 - `projects`
 - `searches`
 - `search_classes`
+- `search_source_checks`
 - `matches`
 - `reports`
 
-Funciones:
+Funciones SQL:
 
 - `recommend_nice_classes(description text)`
+- `text_similarity(a text, b text)`
 
 Edge Functions:
 
-- `analyze-mark`
+- `analyze-mark`: ejecuta el análisis demostrativo autenticado, guarda el mapa por clase y registra el estado de Niza, SIPI y RUES.
+- `import-official-results`: permite importar de manera segura resultados estructurados provenientes de SIPI o RUES después de una consulta oficial.
+
+## Fuentes
+
+### Clasificación de Niza
+
+La versión registrada en el sistema es `NCL 13-2026`, vigente desde el 1 de enero de 2026. La base contiene las 45 clases y metadatos de versión. La siguiente etapa de sincronización debe completar los términos y notas explicativas oficiales en español.
+
+### SIPI / SIC
+
+La aplicación abre la fuente oficial y está preparada para importar resultados verificados. No se presenta el motor demo como una consulta de antecedentes de la SIC.
+
+### RUES
+
+Se mantiene separado del análisis marcario porque la homonimia empresarial no equivale a derechos de marca. Se identificó documentación de un endpoint `consultarNombre` en un ambiente de pruebas de RUES, pero la integración productiva queda condicionada a credenciales y autorización.
 
 ## Seguridad
 
-El frontend utiliza únicamente la clave pública/publishable de Supabase. Las operaciones de usuario están protegidas con autenticación y RLS. La Edge Function valida el JWT antes de ejecutar el análisis.
+El frontend utiliza únicamente la clave publicable de Supabase. La clave `service_role` permanece únicamente en las Edge Functions. Las tablas de usuario usan RLS y las Edge Functions validan JWT. Después de la última migración, el Security Advisor de Supabase no reporta lints.
 
-## Importante
+## Estado jurídico del resultado
 
-El motor de coincidencias actual es **demostrativo y determinista** (`demo-deterministic-v1`). No consulta todavía antecedentes oficiales en tiempo real y sus resultados no deben interpretarse como una decisión jurídica ni como una búsqueda oficial de antecedentes.
+Mientras las fuentes oficiales no estén completas, `overall_risk` se conserva como `insufficient` y `overall_score` como `null`. Los scores y riesgos por clase generados por el motor demo sirven únicamente para validar UX y metodología.
 
-La aplicación mantiene separadas las fuentes:
+> Este análisis es preliminar y no constituye una decisión de registrabilidad. La decisión corresponde exclusivamente a la Superintendencia de Industria y Comercio.
 
-1. **Niza**: catálogo almacenado y operativo.
-2. **SIPI / SIC**: adaptador pendiente para antecedentes de signos distintivos.
-3. **RUES**: adaptador pendiente para homonimia y nombres empresariales.
+## Pendientes para V1 productiva
 
-## Próxima iteración
-
-- Integración técnicamente sostenible y autorizada con SIPI/SIC.
-- Adaptador RUES.
-- Sustitución progresiva del motor demo por similitud denominativa, ortográfica, fonética y semántica basada en antecedentes reales.
-- Explicabilidad detallada del score.
-- Comparador de candidatos de naming.
-- Informe PDF profesional con trazabilidad de fuentes.
-- Vigilancia marcaria periódica.
-
-## Rama de trabajo
-
-`mvp-marcacheck-360`
+- Crear/conectar el proyecto de Vercel para `julian8811/marca-diagnostico` y ejecutar pruebas E2E en una URL pública.
+- Completar la importación oficial en español de NCL 13-2026.
+- Obtener acceso productivo autorizado a RUES o mantener el flujo asistido/importado.
+- Resolver integración autorizada con SIPI o mantener consulta oficial + importación estructurada.
+- Construir similitud fonética y semántica sobre antecedentes reales.
+- Añadir interfaz de importación oficial SIPI/RUES.
+- Añadir recuperación de contraseña, configuración de correo y controles antiabuso para Auth.
+- Generar informes PDF almacenados con snapshot, fuentes, evidencia y checksum.
