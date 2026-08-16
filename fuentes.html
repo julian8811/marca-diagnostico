@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fuentes oficiales · MarcaCheck 360</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--b:#0f766e;--b2:#14b8a6;--ink:#17211f;--mut:#68726f;--line:#dce5e2;--bg:#f3f7f6;--ok:#16865b;--warn:#b7791f;--bad:#c2413b}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink)}button,input,textarea,select{font:inherit}.top{background:#fff;border-bottom:1px solid var(--line)}.topin,.wrap{max-width:1120px;margin:auto;padding:14px 18px}.topin{display:flex;justify-content:space-between;align-items:center}.brand{font-weight:900}.wrap{padding-top:32px;padding-bottom:60px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 14px 40px #17211f12}.card h2{margin-top:0}.mut{color:var(--mut);line-height:1.55}.field{margin:14px 0}.field label{display:block;font-size:.82rem;font-weight:850;margin-bottom:6px}.input{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fbfcfb}.primary,.ghost{border-radius:11px;padding:10px 14px;font-weight:850;cursor:pointer}.primary{border:0;background:linear-gradient(135deg,var(--b),var(--b2));color:white}.ghost{border:1px solid var(--line);background:#fff;color:var(--ink)}.row{display:flex;gap:8px;flex-wrap:wrap}.status{padding:10px 12px;border-radius:10px;background:#f7faf9;font-size:.82rem;margin-top:10px}.status.ok{background:#edf9f3;color:var(--ok)}.status.warn{background:#fff7e8;color:var(--warn)}.status.bad{background:#fff0ef;color:var(--bad)}.source{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}.source b{display:block;margin-bottom:5px}.source a{color:var(--b);font-weight:800;text-decoration:none}.help{font-size:.78rem;color:var(--mut);line-height:1.55}.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem}.hidden{display:none!important}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topin"><div class="brand">MarcaCheck 360 · Fuentes oficiales</div><div class="row"><a class="ghost" href="/">Volver al análisis</a><button id="logout" class="ghost hidden">Salir</button></div></div></header>
+<main class="wrap">
+<h1>Completa una búsqueda con SIPI y RUES</h1><p class="mut">Esta pantalla permite asociar resultados obtenidos de fuentes oficiales a una búsqueda ya creada. La aplicación recalcula similitud ortográfica y fonética automáticamente en el backend. No se presentan datos simulados como antecedentes oficiales.</p>
+<div class="grid">
+<section class="card"><h2>1. Sesión y búsqueda</h2><div id="authBox"><div class="field"><label>Correo</label><input id="email" class="input" type="email"></div><div class="field"><label>Contraseña</label><input id="password" class="input" type="password"></div><button id="login" class="primary">Ingresar</button><div id="authStatus" class="status warn">Debes iniciar sesión para importar resultados.</div></div><div id="searchBox" class="hidden"><div class="field"><label>Búsqueda</label><select id="searchSelect" class="input"></select></div><button id="reload" class="ghost">Actualizar historial</button><div id="searchStatus" class="status"></div></div></section>
+<section class="card"><h2>2. Consulta oficial</h2><div class="source"><b>SIPI · SIC</b><p class="help">Consulta antecedentes marcarios y copia los resultados relevantes a la estructura de importación.</p><a href="https://sipi.sic.gov.co/sipi/extra/" target="_blank" rel="noopener">Abrir SIPI oficial</a></div><div class="source"><b>RUES</b><p class="help">Consulta homonimia y nombres empresariales. RUES no concede derechos marcarios.</p><a href="https://rues.org.co/" target="_blank" rel="noopener">Abrir RUES oficial</a></div></section>
+<section class="card"><h2>3. Importar SIPI</h2><p class="help">Pega un arreglo JSON. Los campos mínimos son <span class="code">matched_name</span>. Opcionales: <span class="code">class_no, legal_status, external_id, titular, expediente, registro, source_url</span>.</p><textarea id="sipiJson" class="input code" rows="13">[
+  {
+    "matched_name": "EJEMPLO MARCA",
+    "class_no": 3,
+    "legal_status": "Registrada",
+    "titular": "Titular",
+    "expediente": "000000"
+  }
+]</textarea><div class="row"><button class="primary" data-source="sipi">Importar SIPI</button><button class="ghost" data-clear="sipi">Limpiar</button></div><div id="sipiStatus" class="status"></div></section>
+<section class="card"><h2>4. Importar RUES</h2><p class="help">Para RUES puedes usar <span class="code">matched_name</span> o <span class="code">razon_social</span>. También admite <span class="code">nit, camara, external_id, source_url</span>.</p><textarea id="ruesJson" class="input code" rows="13">[
+  {
+    "razon_social": "EJEMPLO S.A.S.",
+    "nit": "900000000",
+    "camara": "Medellín"
+  }
+]</textarea><div class="row"><button class="primary" data-source="rues">Importar RUES</button><button class="ghost" data-clear="rues">Limpiar</button></div><div id="ruesStatus" class="status"></div></section>
+<section class="card" style="grid-column:1/-1"><h2>5. Estado de completitud</h2><div id="checks" class="mut">Selecciona una búsqueda para consultar el estado de las fuentes.</div><div class="row" style="margin-top:14px"><button id="generateReport" class="primary">Generar informe trazable</button><button id="openReport" class="ghost hidden">Abrir informe</button></div><div id="reportStatus" class="status"></div></section>
+</div>
+</main>
+<script>
+const URL='https://fyjvswgqgyvrakluyteq.supabase.co',KEY='sb_publishable_R6Wseju-vULpJt9lIrWl5Q_Zj4sC6yH';
+const sb=supabase.createClient(URL,KEY);const $=id=>document.getElementById(id);let user=null,lastReportHtml='';
+function setStatus(id,text,type=''){const el=$(id);el.textContent=text;el.className='status '+type;}
+async function login(){const email=$('email').value.trim(),password=$('password').value;const {error}=await sb.auth.signInWithPassword({email,password});if(error)setStatus('authStatus',error.message,'bad');}
+async function logout(){await sb.auth.signOut();}
+function applySession(session){user=session?.user||null;$('authBox').classList.toggle('hidden',!!user);$('searchBox').classList.toggle('hidden',!user);$('logout').classList.toggle('hidden',!user);if(user){loadSearches();setStatus('authStatus','Sesión iniciada.','ok')}else{$('checks').textContent='Inicia sesión para continuar.'}}
+async function loadSearches(){const {data,error}=await sb.from('searches').select('id,sign,status,created_at,source_status').order('created_at',{ascending:false}).limit(50);if(error){setStatus('searchStatus',error.message,'bad');return}const sel=$('searchSelect');sel.innerHTML='';(data||[]).forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=`${x.sign} · ${new Date(x.created_at).toLocaleString('es-CO')} · ${x.status}`;sel.appendChild(o)});if(data?.length){setStatus('searchStatus',`${data.length} búsqueda(s) disponibles.`,'ok');loadChecks()}else setStatus('searchStatus','No hay búsquedas guardadas.','warn')}
+async function loadChecks(){const id=$('searchSelect').value;if(!id)return;const {data,error}=await sb.from('search_source_checks').select('source,status,message,checked_at').eq('search_id',id).order('source');if(error){$('checks').textContent=error.message;return}$('checks').innerHTML=(data||[]).map(c=>`<div class="source"><b>${c.source.toUpperCase()} · ${c.status}</b><div>${c.message||''}</div><small>${new Date(c.checked_at).toLocaleString('es-CO')}</small></div>`).join('')||'Sin estados registrados.'}
+async function importSource(source){const id=$('searchSelect').value;if(!id){setStatus(source+'Status','Selecciona una búsqueda.','warn');return}let results;try{results=JSON.parse($(source+'Json').value)}catch{setStatus(source+'Status','JSON inválido.','bad');return}if(!Array.isArray(results)){setStatus(source+'Status','Debes pegar un arreglo JSON.','bad');return}setStatus(source+'Status','Importando…');const {data,error}=await sb.functions.invoke('import-official-results',{body:{search_id:id,source,results}});if(error){setStatus(source+'Status',error.message,'bad');return}setStatus(source+'Status',`${data.imported} resultado(s) importado(s). Riesgo global: ${data.overall_risk}.`,'ok');await loadChecks();await loadSearches()}
+async function generateReport(){const id=$('searchSelect').value;if(!id){setStatus('reportStatus','Selecciona una búsqueda.','warn');return}setStatus('reportStatus','Generando informe…');const {data,error}=await sb.functions.invoke('generate-report',{body:{search_id:id}});if(error){setStatus('reportStatus',error.message,'bad');return}lastReportHtml=data.html;$('openReport').classList.remove('hidden');setStatus('reportStatus',`Informe generado y registrado. Checksum: ${data.report.checksum.slice(0,16)}…`,'ok')}
+function openReport(){if(!lastReportHtml)return;const w=window.open('','_blank');w.document.open();w.document.write(lastReportHtml);w.document.close()}
+$('login').onclick=login;$('logout').onclick=logout;$('reload').onclick=loadSearches;$('searchSelect').onchange=loadChecks;$('generateReport').onclick=generateReport;$('openReport').onclick=openReport;
+document.querySelectorAll('[data-source]').forEach(b=>b.onclick=()=>importSource(b.dataset.source));document.querySelectorAll('[data-clear]').forEach(b=>b.onclick=()=>{$(b.dataset.clear+'Json').value='[]'});
+sb.auth.onAuthStateChange((_e,s)=>applySession(s));(async()=>{const {data:{session}}=await sb.auth.getSession();applySession(session)})();
+</script>
+</body>
+</html>
