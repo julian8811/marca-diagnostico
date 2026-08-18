@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  marcacheck:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - SUPA_SERVICE_ROLE=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5anZzd2dxZ3l2cmFrbHV5dGVxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4Njg3NTgwNCwiZXhwIjoyMTAyNDUxODA0fQ.xhjFRB1g8mGEe0QvaBhQvO5SkwIQZ0GKUeWg7KG32BU
+    volumes:
+      - ./scripts:/app/scripts
