@@ -2,15 +2,13 @@
   "name": "marca-diagnostico",
   "version": "1.0.0",
   "description": "Plataforma de prediagnóstico marcario para Colombia",
-  "main": "server.mjs",
+  "main": "server-simple.mjs",
   "type": "module",
   "scripts": {
-    "start": "node server.mjs",
-    "postinstall": "npx playwright install chromium"
+    "start": "node server-simple.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "playwright": "^1.61.0"
+    "express": "^5.2.1"
   }
 }
