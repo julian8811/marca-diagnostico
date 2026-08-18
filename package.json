@@ -1,22 +1,13 @@
 {
   "name": "marca-diagnostico",
   "version": "1.0.0",
-  "description": "Plataforma de prediagnóstico marcario para Colombia. Organiza la clasificación de productos y servicios, la consulta asistida de antecedentes oficiales y la trazabilidad del análisis sin presentar resultados preliminares como una decisión de registrabilidad.",
-  "main": "index.js",
+  "description": "Plataforma de prediagnóstico marcario para Colombia",
+  "main": "server.mjs",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.mjs",
+    "postinstall": "npx playwright install chromium"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/julian8811/marca-diagnostico.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/julian8811/marca-diagnostico/issues"
-  },
-  "homepage": "https://github.com/julian8811/marca-diagnostico#readme",
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
